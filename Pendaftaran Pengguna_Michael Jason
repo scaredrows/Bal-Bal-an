@@ -1,0 +1,58 @@
+<?php
+// Simulasi database pengguna
+$users = [];
+
+// Fungsi untuk validasi email
+function isEmailValid($email) {
+    return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+}
+
+// Fungsi untuk mengecek apakah email sudah terdaftar
+function isEmailRegistered($email, $users) {
+    foreach ($users as $user) {
+        if ($user['email'] === $email) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Fungsi registrasi pengguna
+function registerUser($username, $email, $password, $confirmPassword, &$users) {
+    if (empty($username)) {
+        return "Nama pengguna tidak boleh kosong.";
+    }
+    if (!isEmailValid($email)) {
+        return "Email tidak valid.";
+    }
+    if (isEmailRegistered($email, $users)) {
+        return "Email sudah terdaftar.";
+    }
+    if (strlen($password) < 8) {
+        return "Password terlalu pendek.";
+    }
+    if ($password !== $confirmPassword) {
+        return "Password dan konfirmasi tidak cocok.";
+    }
+
+    // Hash password
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
+    // Simpan user ke "database"
+    $users[] = [
+        'username' => $username,
+        'email' => $email,
+        'password' => $hashedPassword
+    ];
+
+    return "Pendaftaran berhasil untuk: $username. Silakan cek email Anda untuk verifikasi.";
+}
+
+// Contoh input pendaftaran
+$result = registerUser('John Doe', 'johndoe@example.com', 'password123', 'password123', $users);
+echo $result;
+
+// Contoh input pendaftaran kedua (gagal karena email sudah terdaftar)
+$result = registerUser('Jane Doe', 'johndoe@example.com', 'password456', 'password456', $users);
+echo "\n" . $result;
+?>
