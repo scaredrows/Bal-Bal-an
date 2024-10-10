@@ -1,0 +1,76 @@
+<?php
+// Simulasi database lapangan
+$fields = [
+    [
+        'id' => 1,
+        'name' => 'Lapangan A',
+        'location' => 'Purwokerto Selatan',
+        'type' => 'Futsal',
+        'availability' => ['2024-10-10', '2024-10-11', '2024-10-12'],
+        'price_per_hour' => 500000
+    ],
+    [
+        'id' => 2,
+        'name' => 'Lapangan B',
+        'location' => 'Purwokerto Timur',
+        'type' => 'Futsal',
+        'availability' => ['2024-10-10', '2024-10-13'],
+        'price_per_hour' => 300000
+    ],
+    [
+        'id' => 3,
+        'name' => 'Lapangan C',
+        'location' => 'Purwokerto Utara',
+        'type' => 'Futsal',
+        'availability' => ['2024-10-14', '2024-10-15'],
+        'price_per_hour' => 400000
+    ]
+];
+
+// Fungsi untuk mencari lapangan berdasarkan kriteria
+function searchFields($fields, $location = null, $type = null, $date = null) {
+    $results = [];
+
+    foreach ($fields as $field) {
+        // Cek kriteria pencarian
+        $matchesLocation = $location ? strcasecmp($field['location'], $location) == 0 : true;
+        $matchesType = $type ? strcasecmp($field['type'], $type) == 0 : true;
+        $matchesDate = $date ? in_array($date, $field['availability']) : true;
+
+        // Jika semua kriteria cocok, tambahkan ke hasil
+        if ($matchesLocation && $matchesType && $matchesDate) {
+            $results[] = $field;
+        }
+    }
+
+    return $results;
+}
+
+// Fungsi untuk menghitung pembayaran
+function calculatePayment($field, $hours) {
+    $totalPrice = $field['price_per_hour'] * $hours;
+    return $totalPrice;
+}
+
+// Contoh penggunaan fungsi pencarian
+$searchLocation = 'Purwokerto Selatan'; // Lokasi yang dicari
+$searchType = 'Futsal';   // Jenis lapangan yang dicari
+$searchDate = '2024-10-10';   // Tanggal yang dicari
+$rentDuration = 3;            // Durasi sewa dalam jam
+
+$foundFields = searchFields($fields, $searchLocation, $searchType, $searchDate);
+
+// Menampilkan hasil pencarian dan menghitung total pembayaran
+if (!empty($foundFields)) {
+    echo "Hasil pencarian lapangan:\n";
+    foreach ($foundFields as $field) {
+        echo "ID: {$field['id']}, Nama: {$field['name']}, Lokasi: {$field['location']}, Tipe: {$field['type']}, Harga per Jam: Rp " . number_format($field['price_per_hour'], 0, ',', '.') . "\n";
+        
+        // Menghitung total pembayaran
+        $totalPayment = calculatePayment($field, $rentDuration);
+        echo "Total pembayaran untuk durasi $rentDuration jam: Rp " . number_format($totalPayment, 0, ',', '.') . "\n\n";
+    }
+} else {
+    echo "Tidak ada lapangan yang ditemukan dengan kriteria pencarian tersebut.";
+}
+?>
